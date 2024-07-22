@@ -3,10 +3,7 @@ package db;
 import Entity.Group;
 import Entity.Student;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,5 +48,35 @@ public class DBManager {
             e.printStackTrace();
         }
         return students;
+    }
+
+    public static int getGroupId(String groupName) {
+        try {
+            ResultSet resultSet = statement.executeQuery(String.format("SELECT id FROM students.groupp as g where g.group='%s';", groupName));
+
+            while (resultSet.next()){
+                return resultSet.getInt(ID);
+            }
+
+            statement.execute(String.format("insert into `groupp` (`group`) values ('%s')", groupName));
+            resultSet = statement.executeQuery(String.format("SELECT id FROM students.groupp as g where g.group='%s';", groupName));
+
+            while (resultSet.next()){
+                return resultSet.getInt(ID);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        throw new RuntimeException("Ошибка создания группы");
+    }
+
+    public static void createStudent(String surname, String name, int groupId, String date){
+        try {
+            statement.execute(String.format("insert into `student` (`surname`, `name`, `id_group`, `date`) values " +
+                    "('%s', '%s', '%d', '%s');", surname, name, groupId, date));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
     }
 }
