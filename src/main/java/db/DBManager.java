@@ -8,6 +8,9 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static Constants.Constants.DB_ADRESS;
+import static Constants.Constants.REMOTE_DB_ADRESS;
+
 public class DBManager {
 
     private static Statement statement;
@@ -20,7 +23,7 @@ public class DBManager {
     static {
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/students?user=root&password=iamroot");
+            Connection connection = DriverManager.getConnection(DB_ADRESS);
             statement = connection.createStatement();
         } catch (Exception e) {
             e.printStackTrace();
