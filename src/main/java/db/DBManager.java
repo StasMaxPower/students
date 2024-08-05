@@ -22,6 +22,7 @@ public class DBManager {
     private static final String GRADE_VALUE = "value";
     private static final String DISCIPLINE_ID = "id_discipline";
     private static final String DISCIPLINE_NAME = "discipline";
+    private static final String ROLE = "role";
 
 
     static {
@@ -154,7 +155,7 @@ public class DBManager {
                     "join discipline as d on td.id_discipline=d.id " +
                     "where g.id_student='%s' and td.id_term='%s';", studentId, termId));
 
-            while (resultSet.next()){
+            while (resultSet.next()) {
                 Grade grade = new Grade();
                 grade.setValue(resultSet.getInt(GRADE_VALUE));
                 Discipline discipline = new Discipline();
@@ -168,4 +169,56 @@ public class DBManager {
         }
         return grades;
     }
+
+    public static List<Discipline> getDisciplinesByTermId(String termId) {
+        List<Discipline> result = new ArrayList<>();
+        try {
+            ResultSet resultSet = statement.executeQuery(String.format("select d.discipline from term_discipline as td " +
+                    "join discipline as d on td.id_discipline=d.id " +
+                    "where id_term='%s'", termId));
+
+            while (resultSet.next()) {
+                Discipline discipline = new Discipline();
+                discipline.setName(resultSet.getString(DISCIPLINE_NAME));
+                result.add(discipline);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+
+    public static List<Role> getAllRoles() {
+        List<Role> result = new ArrayList<>();
+        try {
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM role;");
+
+            while (resultSet.next()) {
+                Role role = new Role();
+                role.setName(resultSet.getString(ROLE));
+                role.setId(resultSet.getInt(ID));
+                result.add(role);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    public static boolean isAuthorised(String login, String password, String roleId) {
+        try {
+            ResultSet resultSet = statement.executeQuery(String.format("select * from user_role as ur " +
+                    "join user as u on ur.id_user = u.id " +
+                    "where ur.id_role = '%s' and u.user = '%s' and u.password ='%s';", roleId, login, password));
+
+            while (resultSet.next()) {
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
 }
